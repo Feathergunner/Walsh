@@ -1,21 +1,131 @@
 #include "../include/WalshExpansion.h"
+
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 //simple method to invert 8-bit-grayvalues:
-uint8_t invert(uint8_t val){
+uint8_t WalshExpansion::invert(uint8_t val){
     return 255-val;
 }
 
 /*
-    WalshExpansion for discrete Matrix A
-    - all the values from A are ZERO or NON-ZERO(i.e. 1)
-    - inverts 0 to 1 and 1 to 0
+ simple invert method
+*/
+uint8_t WalshExpansion::discreteTransform(uint8_t base, uint8_t factor){
+    if (factor > 127) return invert(base);
+    else return base;
+}
 
+/*
+ smooth transformation of grayscale-values:
+
+ - base: the current value to copy in the output-matrix
+ - factor: the coresponding value in the input-matrix
+
+ rules of thumb:
+ - f == 0 or f == 255 => equivalent to simple invert-method
+ - f in between => new value gets compressed towards 127(gray)
+   - f < 127 => orientation of b inverted (<127 => >127 or >127 => <127)
+   - f > 127 => orientation of b stayes as-is
+ - independent of orientation, b becomes compressed like new=b*f/128
+*/
+uint8_t WalshExpansion::smoothTransform(uint8_t base, uint8_t factor){
+
+    uint16_t ret_16, b_16, f_16;
+    uint8_t ret_8;
+    bool inv = false, bigbase = false;
+    if (factor > 127){
+    	inv = true;
+    	f_16 = factor-127;
+    }else f_16 = 127-factor;
+    if (base > 127){
+    	bigbase = true;
+    	b_16 = base - 127;
+    }else b_16 = 127-base;
+
+    ret_16 = (b_16 * f_16)/128;
+    ret_8 = (uint8_t)ret_16;
+
+    if (bigbase) ret_8 += 127;
+    else ret_8 = 127-ret_8;
+    if (inv) return invert(ret_8);
+    else return ret_8;
+
+    //printf("evaluated b=%u, f=%u to %u\n",base,factor,ret_16);
+    /*
+    //if (x<127) ret = x;
+    //else ret = x-128;
+    uint8_t ret;
+    if (factor < 128)
+        if (base < 128)
+            ret =((base+factor)/2)+128;
+        else
+            ret = (((base-128)+factor)/2)+128;
+    else{
+        factor -= 128;
+        if (base < 128)
+            ret = (base+factor)/2;
+        else
+            ret = ((base+(factor-128))/2)+128;
+    }
+    */
+    //return ret;
+}
+
+/*
+ like smooth transform, but computes midvalue between base- and factor- grayvalue
+*/
+uint8_t WalshExpansion::smoothMidTransform(uint8_t base, uint8_t factor){
+    uint8_t ret;
+    bool inv = false, bigbase = false;
+    if (factor > 127){
+    	inv = true;
+    	factor -= 127;
+    }else factor = 127-factor;
+    if (base > 127){
+    	bigbase = true;
+    	base -= 127;
+    }else base = 127-base;
+
+    ret = (base * factor)/128;
+
+    if (bigbase) ret += 127;
+    else ret = 127-ret;
+    if (inv) return invert(ret);
+    else return ret;
+}
+
+/*
+ a purposly buggy transform that creates a glitch-like noize-effect by uint8-overflow
+*/
+uint8_t WalshExpansion::noizeTransform(uint8_t base, uint8_t factor){
+    uint8_t ret;
+    bool inv = false, bigbase = false;
+    if (factor > 127){
+    	inv = true;
+    	factor -= 127;
+    }else factor = 127-factor;
+    if (base > 127){
+    	bigbase = true;
+    	base -= 127;
+    }else base = 127-base;
+
+    ret = (base+factor)/2;
+
+    if (bigbase) ret += 127;
+    else ret = 127-ret;
+    if (inv) return invert(ret);
+    else return ret;
+}
+
+/*
+    general WalshExpansion for Matrix A
+    - all the values from A are in (0,255)
+    - transforms by specified method type
     Expanded Matrix is saved in classvar gray
 */
-bool WalshExpansion::discreteWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, uint8_t num_of_iterations){
+bool WalshExpansion::generalWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, uint8_t num_of_iterations, WalshExpType type){
     //initialise final matrix:
     //size:
     //uint32_t w,h;
@@ -51,32 +161,19 @@ bool WalshExpansion::discreteWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, ui
                      for every position in A, copy (and invert, if A[x][y]==255)
                      the matrix computed in the last step to new position
                     */
-                    if (A[x][y]==0){
-                        for (int xx=0; xx<w_lit; xx++)
-                            for (int yy=0; yy<h_lit; yy++){
-                                gray[w_lit*x+xx][h_lit*y+yy]=gray[xx][yy];
-                                //printf("current pos: x=%u, y=%u\n",w_lit*x+xx,h_lit*y+yy);
+                    for (int xx=0; xx<w_lit; xx++)
+                        for (int yy=0; yy<h_lit; yy++)
+                            switch(type){
+                                case EXP_DISCRETE    : gray[w_lit*x+xx][h_lit*y+yy] = discreteTransform( gray[xx][yy] , A[x][y] ); break;
+                                case EXP_SMOOTH_STD  : gray[w_lit*x+xx][h_lit*y+yy] = smoothTransform( gray[xx][yy] , A[x][y] ); break;
+                                case EXP_SMOOTH_MID  : gray[w_lit*x+xx][h_lit*y+yy] = smoothMidTransform( gray[xx][yy] , A[x][y] ); break;
+                                case EXP_SMOOTH_NOIZ : gray[w_lit*x+xx][h_lit*y+yy] = noizeTransform( gray[xx][yy] , A[x][y] ); break;
                             }
-                    }else{
-                        for (int xx=0; xx<w_lit; xx++)
-                            for (int yy=0; yy<h_lit; yy++){
-                                gray[w_lit*x+xx][h_lit*y+yy]=invert(gray[xx][yy]);
-                                //printf("current pos: x=%u, y=%u\n",w_lit*x+xx,h_lit*y+yy);
-                            }
-                    }
+
                 }
             }
     }
     return true;
-}
-
-/*
-    To Do:
-    a smooth version of the WalshExpansion that respects grayvalues
-*/
-bool WalshExpansion::smoothWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, uint8_t num_of_iterations){
-
-    return false;
 }
 
 /*

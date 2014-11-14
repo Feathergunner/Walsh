@@ -1,0 +1,11 @@
+#ifndef WALSHTYPES
+#define WALSHTYPES
+
+enum WalshExpType{
+    EXP_DISCRETE,
+    EXP_SMOOTH_STD,
+    EXP_SMOOTH_MID,
+    EXP_SMOOTH_NOIZ
+};
+
+#endif // WALSHTYPES
