@@ -51,26 +51,6 @@ uint8_t WalshExpansion::smoothTransform(uint8_t base, uint8_t factor){
     else ret_8 = 127-ret_8;
     if (inv) return invert(ret_8);
     else return ret_8;
-
-    //printf("evaluated b=%u, f=%u to %u\n",base,factor,ret_16);
-    /*
-    //if (x<127) ret = x;
-    //else ret = x-128;
-    uint8_t ret;
-    if (factor < 128)
-        if (base < 128)
-            ret =((base+factor)/2)+128;
-        else
-            ret = (((base-128)+factor)/2)+128;
-    else{
-        factor -= 128;
-        if (base < 128)
-            ret = (base+factor)/2;
-        else
-            ret = ((base+(factor-128))/2)+128;
-    }
-    */
-    //return ret;
 }
 
 /*
@@ -111,7 +91,7 @@ uint8_t WalshExpansion::noizeTransform(uint8_t base, uint8_t factor){
     	base -= 127;
     }else base = 127-base;
 
-    ret = (base+factor)/2;
+    ret = base*factor;
 
     if (bigbase) ret += 127;
     else ret = 127-ret;
