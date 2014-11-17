@@ -19,19 +19,23 @@ int main(){
         0 255
         (note that in the .bmp-output, 0 results in a black and 255 in a white pixel)
     */
+
+    // define your own matrix here to produce individual images:
     mat_u8 walsh = mat_u8(2,vec_u8(2,0));
-    walsh[0][0]=250;
-    walsh[1][1]=150;
+    walsh[1][1]=220;
 
     //get size of input-matrix:
     int width = walsh.size();
     int height = walsh[0].size();
 
+    // change number of steps to manipulate image size
+    // (image size = 2^{steps+1}
     int steps = 9;
 
     //start walshExpansion:
-    //we.discreteWalshExpansion(width,height,walsh,steps);
-    we.generalWalshExpansion(width,height,walsh,steps,EXP_SMOOTH_NOIZ);
+    //change the used expansion function (see include/WalshExptypes.cpp and the functions in src/WalshExpansion.cpp)
+    // or define your own Expansion-function
+    we.generalWalshExpansion(width,height,walsh,steps,EXP_SMOOTH_STD);
 
     if(steps<5) we.printgray();
 

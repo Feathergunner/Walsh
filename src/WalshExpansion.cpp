@@ -31,7 +31,6 @@ uint8_t WalshExpansion::discreteTransform(uint8_t base, uint8_t factor){
  - independent of orientation, b becomes compressed like new=b*f/128
 */
 uint8_t WalshExpansion::smoothTransform(uint8_t base, uint8_t factor){
-
     uint16_t ret_16, b_16, f_16;
     uint8_t ret_8;
     bool inv = false, bigbase = false;
@@ -77,7 +76,7 @@ uint8_t WalshExpansion::smoothMidTransform(uint8_t base, uint8_t factor){
 }
 
 /*
- a purposly buggy transform that creates a glitch-like noize-effect by uint8-overflow
+ a purposly buggy transform that creates a strong noize-effect by uint8-overflow
 */
 uint8_t WalshExpansion::noizeTransform(uint8_t base, uint8_t factor){
     uint8_t ret;
@@ -97,6 +96,55 @@ uint8_t WalshExpansion::noizeTransform(uint8_t base, uint8_t factor){
     else ret = 127-ret;
     if (inv) return invert(ret);
     else return ret;
+}
+
+/*
+ aaaaand another one
+ aim is to create a glitch-like noize-effect by changing the grayvalues to constants within certain intervals
+*/
+uint8_t WalshExpansion::noiz2Transform(uint8_t base, uint8_t factor){
+uint16_t ret_16, b_16, f_16;
+    uint8_t ret_8;
+    bool inv = false, bigbase = false;
+    if (factor > 127){
+    	inv = true;
+    	f_16 = factor-127;
+    }else f_16 = 127-factor;
+    if (base > 127){
+    	bigbase = true;
+    	b_16 = base - 127;
+    }else b_16 = 127-base;
+
+    ret_16 = (b_16 * f_16)/128;
+    ret_8 = (uint8_t)ret_16;
+    if (ret_8 > 28 && ret_8 < 36) ret_8 = 125;
+    if (ret_8 > 92 && ret_8 < 100) ret_8 = 125;
+
+    if (bigbase) ret_8 += 127;
+    else ret_8 = 127-ret_8;
+    if (inv) return invert(ret_8);
+    else return ret_8;
+}
+
+/*
+ aaaaand another one
+ this one ignoring orientaton, creating darker results:
+*/
+uint8_t WalshExpansion::noiz3Transform(uint8_t base, uint8_t factor){
+    uint16_t ret_16, b_16, f_16;
+    uint8_t ret_8;
+    bool inv = false, bigbase = false;
+    if (factor > 127){
+    	inv = true;
+    	f_16 = factor-127;
+    }else f_16 = 127-factor;
+    if (base > 127){
+    	bigbase = true;
+    	b_16 = base - 127;
+    }else b_16 = 127-base;
+
+    ret_16 = (b_16 * f_16)/128;
+    return (uint8_t)ret_16;
 }
 
 /*
@@ -148,6 +196,8 @@ bool WalshExpansion::generalWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, uin
                                 case EXP_SMOOTH_STD  : gray[w_lit*x+xx][h_lit*y+yy] = smoothTransform( gray[xx][yy] , A[x][y] ); break;
                                 case EXP_SMOOTH_MID  : gray[w_lit*x+xx][h_lit*y+yy] = smoothMidTransform( gray[xx][yy] , A[x][y] ); break;
                                 case EXP_SMOOTH_NOIZ : gray[w_lit*x+xx][h_lit*y+yy] = noizeTransform( gray[xx][yy] , A[x][y] ); break;
+                                case EXP_SMOOTH_NOI2 : gray[w_lit*x+xx][h_lit*y+yy] = noiz2Transform( gray[xx][yy] , A[x][y] ); break;
+                                case EXP_SMOOTH_NOI3 : gray[w_lit*x+xx][h_lit*y+yy] = noiz3Transform( gray[xx][yy] , A[x][y] ); break;
                             }
 
                 }

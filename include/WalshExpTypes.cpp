@@ -5,7 +5,9 @@ enum WalshExpType{
     EXP_DISCRETE,
     EXP_SMOOTH_STD,
     EXP_SMOOTH_MID,
-    EXP_SMOOTH_NOIZ
+    EXP_SMOOTH_NOIZ,
+    EXP_SMOOTH_NOI2,
+    EXP_SMOOTH_NOI3
 };
 
 #endif // WALSHTYPES
