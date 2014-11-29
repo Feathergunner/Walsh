@@ -1,38 +1,45 @@
+#ifndef WalshExpansion_h
+#define WalshExpansion_h
+
 #include <cstdint>
 #include <vector>
+#include <math.h>
+//#include <stdlib.h>
+//#include <stdio.h>
+
 #include "typedefs.h"
-#include "WalshExpTypes.cpp"
+#include "WalshExpTypes.h"
+#include "WalshTransformations.h"
 
 class WalshExpansion{
 private:
-    uint8_t invert(uint8_t val);
+  uint8_t invert(uint8_t val);
 
-    /*
-     these transformation-function transform a 8-bit-int- grayvalue "base" dependent on another 8-bit-int-grayvalue "factor"
-     main idea of most of these transformations is:
-        - grayvalues have a "orientation" towards white(>127) or black (<127)
-        - factor < 127 => orientation of base inverted
-        - factor > 127 => orientation of base stayes as-is
-        - independent of orientation, base gets scaled/varied by value of factor
-    */
-    uint8_t discreteTransform(uint8_t base, uint8_t factor);
-    uint8_t smoothTransform(uint8_t base, uint8_t factor);
-    uint8_t smoothMidTransform(uint8_t base, uint8_t factor);
-    uint8_t noizeTransform(uint8_t base, uint8_t factor);
-    uint8_t noiz2Transform(uint8_t base, uint8_t factor);
-    uint8_t noiz3Transform(uint8_t base, uint8_t factor);
+	void computeIteration(uint32_t w_it, uint32_t h_it, uint32_t w_lit, uint32_t h_lit, WalshExpType type);
+	uint8_t discreteTransform(uint8_t base, uint8_t factor);
+	uint8_t Transform(uint8_t base, uint8_t factor, uint16_t(*func)(uint16_t, uint16_t));
 
-    uint32_t width;
-    uint32_t height;
+	// size of resultmatrix:
+  uint32_t width;
+  uint32_t height;
+  
+  // start-matrix:
+  mat_u8 startMatrix;
+  uint8_t aw, ah;
+  
+  // init instance for Walshexpansion:
+  void init(mat_u8 a);
 
 public:
-    //the result:
-    mat_u8 gray;
+  //the result:
+  mat_u8 gray;
+  
 
-    bool generalWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, uint8_t num_of_iterations, WalshExpType type);
-    //bool smoothWalshExpansion(uint8_t Aw, uint8_t Ah, mat_u8 A, uint8_t num_of_iterations);
+  bool generalWalshExpansion(mat_u8 a, uint8_t num_of_iterations, WalshExpType type);
 
-    // print matrix "gray" to console output
-    bool printgray();
+  // print matrix "gray" to console output
+  bool printgray();
 
 };
+
+#endif

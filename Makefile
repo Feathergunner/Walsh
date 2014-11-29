@@ -1,9 +1,15 @@
-CC=g++
-CFLAGS=-std=c++0x
-OUT=jonasundangosinddoof
+CXX = g++
+CXXFLAGS = -std=c++0x -O -c
 
-default:
-	$(CC) $(CFLAGS) main.cpp -o $(OUT)
+SRC = main.cpp src/WalshExpansion.cpp src/WalshTransformations.cpp src/BMPWriter.cpp
+OBJ = $(SRC:.cpp=.o)
+EXECUTABLE = ohnemakeistallesdoof
 
-clean:
-	rm -rf *.o $(OUT)
+%.o: %%.cpp
+	$(CXX) $(CXXFLAGS) $^  
+
+all: $(OBJ)
+	$(CXX) $^ -o $(EXECUTABLE)
+
+.PHONY clean:
+	rm *.o $(EXECUTABLE)
