@@ -54,3 +54,100 @@ void MatrixBuilder::print_Matrix(mat_u8 matrix)
 	std::cout << "\n";
 	return;
 }
+
+mat_u8 MatrixBuilder::get_predefined_Matrix(int id)
+{
+	mat_u8 ret, tl, smooth;
+	switch(id)
+	{
+		case 1:
+			// size: 9x9
+			
+			tl = mat_u8(5,vec_u8(5,0));
+			for (int i=0; i<5; i++){
+				if(i!=3)
+				{
+					tl[i][4] = 255;
+					tl[4][i] = 255;
+				}
+				if (i>1)
+					tl[i][i] = 255;
+				else
+					tl[1-i][i] = 255;
+			}
+			
+			smooth = mat_u8(5,vec_u8(5,99));
+			smooth[0][0] = 50;
+			smooth[0][1] = 55;
+			smooth[1][0] = 55;
+			smooth[1][1] = 60;
+			smooth[0][2] = 65;
+			smooth[2][0] = 65;
+			smooth[2][1] = 70;
+			smooth[1][2] = 70;
+			smooth[2][2] = 75;
+			smooth[3][0] = 80;
+			smooth[0][3] = 80;
+			smooth[3][1] = 85;
+			smooth[1][3] = 85;
+			smooth[3][2] = 90;
+			smooth[2][3] = 90;
+			smooth[3][3] = 95;
+			
+			smoothen_Matrix(&tl, smooth);
+			
+			ret = symmetric_Matrix_Expansion(tl);
+		break;
+		
+		case 2:
+			// X-star
+			// fade out to center
+			// size: 5x5
+			
+			tl = mat_u8(3,vec_u8(3,0));
+			for (int i=0;i<3;i++)
+				tl[i][i]=255;
+			
+			smooth = mat_u8(3,vec_u8(3,0));
+			for (int i=0; i<3; i++)
+				for (int j=0; j<3; j++)
+					smooth[i][j] = 100 - (5*(i+j));
+			
+			smoothen_Matrix(&tl, smooth);
+			
+			ret = symmetric_Matrix_Expansion(tl);
+		break;
+		
+		case 3:
+			// + -star
+			// with additional corner-points
+			// fade out to center
+			
+			// size: 5x5
+			
+			tl = mat_u8(3,vec_u8(3,0));
+			for (int i=0;i<3;i++)
+			{
+				tl[i][2] = 255;
+				tl[2][i] = 255;
+			}
+			tl[0][0] = 255;
+			
+			smooth = mat_u8(3,vec_u8(3,0));
+			for (int i=0; i<3; i++)
+				for (int j=0; j<3; j++)
+					smooth[i][j] = 100 - (5*(i+j));
+			
+			smoothen_Matrix(&tl, smooth);
+			
+			ret = symmetric_Matrix_Expansion(tl);
+		break;
+		
+		default:
+			//std-walsh
+			ret = mat_u8(2,vec_u8(2,0));
+			ret[1][1]=255;
+	}
+	
+	return ret;
+}

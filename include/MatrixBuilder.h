@@ -34,6 +34,8 @@ public:
 	//		10 * 50 ~> 96
 	static void smoothen_Matrix(mat_u8 *matrix, mat_u8 smoothfactor);
 
+	// returns hardcodes mat_u8 by id. if no matrix for given id, returns std-walsh-matrix
+	static mat_u8 get_predefined_Matrix(int id);
 };
 
 #endif
