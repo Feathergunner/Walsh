@@ -42,6 +42,7 @@
         bmpinfoheader[10] = (uint8_t)(       h>>16);
         bmpinfoheader[11] = (uint8_t)(       h>>24);
 
+		remove(filename);
         f = fopen(filename,"wb");
         fwrite(bmpfileheader,1,14,f);
         fwrite(bmpinfoheader,1,40,f);

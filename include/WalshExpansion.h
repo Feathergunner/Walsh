@@ -5,7 +5,7 @@
 #include <vector>
 #include <math.h>
 //#include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 
 #include "typedefs.h"
 #include "WalshExpTypes.h"
@@ -25,7 +25,7 @@ private:
   
   // start-matrix:
   mat_u8 startMatrix;
-  uint8_t aw, ah;
+  uint32_t aw, ah;
   
   // init instance for Walshexpansion:
   void init(mat_u8 a);

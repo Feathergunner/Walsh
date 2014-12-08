@@ -14,7 +14,7 @@
  - independent of orientation, b becomes compressed like new=b*f/128
 */
 uint16_t WalshTransformations::smoothTransform(uint16_t base, uint16_t factor){
-    return (base * factor)/128;
+    return (base * factor)/127;
 }
 
 
