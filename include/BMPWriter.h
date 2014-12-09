@@ -24,13 +24,13 @@ class BMPWriter{
 		http://stackoverflow.com/questions/2654480/writing-bmp-image-in-pure-c-c-without-other-libraries
 
     */
-    void write_col(int w, int h, mat_u8 red, mat_u8 green, mat_u8 blue, const char* filename);
+    static void write_col(int w, int h, mat_u8 red, mat_u8 green, mat_u8 blue, const char* filename);
 
     /*
         method constructs three matrices red, green, blue
         such that the rgb-values resemble the grayvalues of the parameter-matrix grayvals
     */
-    void write_sw(int w, int h, mat_u8 grayvals, const char* filename);
+    static void write_sw(int w, int h, mat_u8 grayvals, const char* filename);
 
 };
 

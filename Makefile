@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++0x -O -c
 
-SRC = main.cpp src/WalshExpansion.cpp src/WalshTransformations.cpp src/BMPWriter.cpp src/MatrixBuilder.cpp
+SRC = main.cpp src/WalshExpansion.cpp src/WalshTransformations.cpp src/BMPWriter.cpp src/MatrixBuilder.cpp src/ImgProcessor.cpp
 OBJ = $(SRC:.cpp=.o)
 EXECUTABLE = ohnemakeistallesdoof
 

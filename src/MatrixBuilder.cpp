@@ -143,6 +143,28 @@ mat_u8 MatrixBuilder::get_predefined_Matrix(int id)
 			ret = symmetric_Matrix_Expansion(tl);
 		break;
 		
+		case 4:
+			// o x o o x
+			// x x x o o
+			// o x o o x
+			// o o o x o
+			// x o x o x
+			ret = mat_u8(5,vec_u8(5,0));
+			ret[0][1] = 255;
+			ret[1][0] = 255;
+			ret[1][1] = 255;
+			ret[1][2] = 255;
+			ret[2][1] = 255;
+			ret[3][3] = 250;
+			ret[4][4] = 250;
+			
+			smooth = mat_u8(5,vec_u8(5,99));
+			for (int i=0; i<5; i++)
+				smooth[i][4-i] =95;
+			
+			smoothen_Matrix(&ret, smooth);
+		break;
+		
 		default:
 			//std-walsh
 			ret = mat_u8(2,vec_u8(2,0));

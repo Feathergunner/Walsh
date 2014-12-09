@@ -2,18 +2,16 @@
 #include <math.h>
 #include <iostream>
 
-//#include "src/WalshExpansion.cpp"
 #include "include/BMPWriter.h"
 #include "include/WalshExpansion.h"
 #include "include/typedefs.h"
 #include "include/WalshExpTypes.h"
 #include "include/MatrixBuilder.h"
-
+#include "include/ImgProcessor.h"
 
 int main(){
     //init:
     WalshExpansion we = WalshExpansion();
-    BMPWriter bw = BMPWriter();
 
 	mat_u8 walsh;
 	
@@ -30,9 +28,9 @@ int main(){
 
     // define your own matrix here to produce individual images:
 	
-	walsh = MatrixBuilder::get_predefined_Matrix(2);
+	walsh = MatrixBuilder::get_predefined_Matrix(4);
 	
-	MatrixBuilder::print_Matrix(walsh);
+	//MatrixBuilder::print_Matrix(walsh);
 	
 
     //get size of input-matrix:
@@ -49,12 +47,32 @@ int main(){
     we.generalWalshExpansion(walsh,steps,EXP_SMOOTH_STD);
 
     if(steps<2) we.printgray();
+	
+	// compute histogramm and cumulative histogram
+	/*
+	vec_u32 hist = ImgProcessor::get_histogram(&(we.gray));
+	vec_u32 c_hist = ImgProcessor::get_cumulative_histogram(&(we.gray));
+	ImgProcessor::write_hist_tofile(hist, "histogram.bmp");
+	ImgProcessor::write_hist_tofile(c_hist, "histogram_cumulative.bmp");
+	*/
+	
+	// apply histogram linearisation
+	ImgProcessor::linearisate_hist(&(we.gray));
+	
+	
+	// compute histogram and cumulative histogram (after linearisation)
+	/*
+	vec_u32 hist_l = ImgProcessor::get_histogram(&(we.gray));
+	vec_u32 c_hist_l = ImgProcessor::get_cumulative_histogram(&(we.gray));
+	ImgProcessor::write_hist_tofile(hist_l, "histogram_lin.bmp");
+	ImgProcessor::write_hist_tofile(c_hist_l, "histogram_lin_cumulative.bmp");
+	*/
 
     //compute resultsize (needed for bmp-export)
     int res_width = pow(width,(steps+1));
     int res_height = pow(height,(steps+1));
 
-    bw.write_sw(res_width,res_height,we.gray,"walsh.bmp");
+    BMPWriter::write_sw(res_width,res_height,we.gray,"walsh.bmp");
 
     return 0;
 }
